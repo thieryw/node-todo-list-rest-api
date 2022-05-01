@@ -5,7 +5,7 @@ import { getTasks, addTask, updateTask, deleteTask, deleteAllTasks } from "./ser
 type task = {
 	message: string;
 	id: string;
-	isDone: boolean;
+	isCompleted: boolean;
 }
 
 const PORT = 5000;
