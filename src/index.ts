@@ -11,10 +11,15 @@ type task = {
 const PORT = 5000;
 
 const server = http.createServer((req, res) => {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Request-Method", "*");
+	res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, POST, DELETE");
+	res.setHeader("Access-Control-Allow-Headers", "*");
+
+	
 	(() => {
 		switch (req.method) {
 			case "GET":
-
 				getTasks({
 					req,
 					res,
