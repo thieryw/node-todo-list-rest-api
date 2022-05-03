@@ -145,14 +145,14 @@ export async function deleteTask(
 	};
 
 
-	const deletedtask = {...tasks[taskToDeleteIndex], "status": "deleted"};
+	const deletedTask = {...tasks[taskToDeleteIndex], "status": "deleted"};
 
 	tasks.splice(taskToDeleteIndex, 1);
 	writeToFile();
 	respond({
 		res,
 		"statusCode": 200,
-		"value": JSON.stringify(deletedtask)
+		"value": JSON.stringify(deletedTask)
 	})
 }
 

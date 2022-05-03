@@ -8,7 +8,7 @@ type task = {
 	isCompleted: boolean;
 }
 
-const PORT = 5000;
+const PORT = 80;
 
 const server = http.createServer((req, res) => {
 	res.setHeader("Access-Control-Allow-Origin", "*");
@@ -16,51 +16,49 @@ const server = http.createServer((req, res) => {
 	res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, POST, DELETE");
 	res.setHeader("Access-Control-Allow-Headers", "*");
 
-	
-	(() => {
-		switch (req.method) {
-			case "GET":
-				getTasks({
-					req,
-					res,
-					"id": req.url === "/" ? undefined : req.url?.replace("/", "")
-				});
-				return;
 
-			case "POST":
+	switch (req.method) {
+		case "GET":
+			getTasks({
+				req,
+				res,
+				"id": req.url === "/" ? undefined : req.url?.replace("/", "")
+			});
+			return;
 
-				addTask({
-					req,
-					res
-				})
-				return;
+		case "POST":
 
-			case "PUT":
-				updateTask({
-					req,
-					res,
-					"id": req.url?.replace("/", "") ?? ""
+			addTask({
+				req,
+				res
+			})
+			return;
 
-				})
-				return;
+		case "PUT":
+			updateTask({
+				req,
+				res,
+				"id": req.url?.replace("/", "") ?? ""
 
-			case "DELETE":
-				(()=>{
-					if(req.url === "/"){
-						deleteAllTasks({
-							req,
-							res
-						});
-						return;
-					}
-					deleteTask({
-						res,
+			})
+			return;
+
+		case "DELETE":
+			(() => {
+				if (req.url === "/") {
+					deleteAllTasks({
 						req,
-						"id": req.url?.replace("/", "") ?? ""
-					})
-				})()
-		}
-	})()
+						res
+					});
+					return;
+				}
+				deleteTask({
+					res,
+					req,
+					"id": req.url?.replace("/", "") ?? ""
+				})
+			})()
+	}
 });
 
 server.listen(PORT, () => { console.log(`server running on localhost:${PORT}`) });
