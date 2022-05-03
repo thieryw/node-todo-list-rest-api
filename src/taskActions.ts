@@ -53,7 +53,7 @@ export async function deleteTask(params: {
 		id: string;
 }) {
 	const { id } = params;
-	const taskToDeleteIndex = tasks.findIndex(task => task.id);
+	const taskToDeleteIndex = tasks.findIndex(task => task.id === id);
 	const taskToDelete = tasks[taskToDeleteIndex];
 	assert(taskToDeleteIndex > -1);
 	tasks.splice(taskToDeleteIndex, 1);
