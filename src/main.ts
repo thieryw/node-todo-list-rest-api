@@ -2,8 +2,8 @@ import http from "http";
 import type { ServerResponse } from "http";
 //const tasks = require("../data/tasks");
 import { getPostData } from "./utils/getPostData";
-import { createFilePersistedTaskApi,/* createRamTaskApi*/ } from "./TaskApi";
-import { join as pathJoin } from "path";
+import { /*createFilePersistedTaskApi*/ createRamTaskApi } from "./TaskApi";
+//import { join as pathJoin } from "path";
 
 const port = 80;
 
@@ -21,9 +21,12 @@ function respond(params: {
 
 function main() {
 
-	const taskApi = createFilePersistedTaskApi({
+	/*const taskApi = createFilePersistedTaskApi({
 		"filePath": pathJoin(process.cwd(), "data", "tasks.json")
-	});
+	});*/
+	const taskApi = createRamTaskApi({
+		"initialTasks": []
+	})
 
 	http.createServer((req, res) => {
 		res.setHeader("Access-Control-Allow-Origin", "*");
@@ -67,7 +70,9 @@ function main() {
 			case "PUT":
 				(async () => {
 					const updatedTask = JSON.parse((await getPostData({ req })));
-					await taskApi.updateTask(updatedTask);
+					await taskApi.updateTask({
+						"task": updatedTask
+					});
 					respond({
 						res,
 						"statusCode": 201,

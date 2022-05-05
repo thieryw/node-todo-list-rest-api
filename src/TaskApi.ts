@@ -96,7 +96,6 @@ function createTaskApi(
 		},
 		"updateTask": ({ task }) => {
 
-
 			tasksMutation({
 				"performMutation": tasks => {
 					const index = tasks.findIndex(({ id }) => id === task.id);
@@ -174,7 +173,6 @@ export function createFilePersistedTaskApi(
 		runExclusive.build(async ({ performMutation }) => {
 
 			const tasks = await (async () => {
-					console.log("ok");
 
 				if (!fs.existsSync(filePath)) {
 					return [];
