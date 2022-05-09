@@ -1,32 +1,20 @@
 [
   {
     "id": 0,
-    "message": "lkj",
-    "isCompleted": false
+    "message": "feed the cat",
+    "isCompleted": false,
+    "isSelected": false
   },
   {
     "id": 1,
-    "message": "mlk",
-    "isCompleted": false
+    "message": "clean the floor",
+    "isCompleted": false,
+    "isSelected": false
   },
   {
     "id": 2,
-    "message": "kk",
-    "isCompleted": false
-  },
-  {
-    "id": 3,
-    "message": "l",
-    "isCompleted": false
-  },
-  {
-    "id": 4,
-    "message": "l",
-    "isCompleted": false
-  },
-  {
-    "id": 5,
-    "message": "l",
-    "isCompleted": false
+    "message": "chop the neighbors head off",
+    "isCompleted": false,
+    "isSelected": false
   }
 ]
