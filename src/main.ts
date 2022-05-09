@@ -2,8 +2,8 @@ import http from "http";
 import type { ServerResponse } from "http";
 //const tasks = require("../data/tasks");
 import { getPostData } from "./utils/getPostData";
-import { /*createFilePersistedTaskApi*/ createRamTaskApi } from "./TaskApi";
-//import { join as pathJoin } from "path";
+import { createFilePersistedTaskApi /*createRamTaskApi*/ } from "./TaskApi";
+import { join as pathJoin } from "path";
 
 const port = 80;
 
@@ -21,18 +21,21 @@ function respond(params: {
 
 function main() {
 
-	/*const taskApi = createFilePersistedTaskApi({
+	const taskApi = createFilePersistedTaskApi({
 		"filePath": pathJoin(process.cwd(), "data", "tasks.json")
-	});*/
-	const taskApi = createRamTaskApi({
+	});
+
+	/*const taskApi = createRamTaskApi({
 		"initialTasks": []
-	})
+	})*/
 
 	http.createServer((req, res) => {
 		res.setHeader("Access-Control-Allow-Origin", "*");
 		res.setHeader("Access-Control-Request-Method", "*");
 		res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, POST, DELETE");
 		res.setHeader("Access-Control-Allow-Headers", "*");
+
+		console.log(req.method);
 
 		switch (req.method) {
 			case "OPTIONS": res.end(); return;
@@ -56,7 +59,8 @@ function main() {
 
 			case "POST":
 				(async () => {
-					const newTask = JSON.parse(await getPostData({ req }));
+					const { postData } = await getPostData({ req });
+					const newTask = JSON.parse(postData);
 					taskApi.addTask(newTask)
 					respond({
 						res,
@@ -69,31 +73,50 @@ function main() {
 
 			case "PUT":
 				(async () => {
-					const updatedTask = JSON.parse((await getPostData({ req })));
-					await taskApi.updateTask({
-						"task": updatedTask
-					});
+					const data = JSON.parse((await getPostData({ req })).postData);
+
+					updateData: {
+						if (data.hasOwnProperty("length")) {
+							await taskApi.updateTasks({
+								"tasks": data
+							});
+							break updateData;
+						};
+
+						await taskApi.updateTask({
+							"task": data
+						});
+					};
+
 					respond({
 						res,
 						"statusCode": 201,
-						"chunk": updatedTask
+						"chunk": data
 					});
 				})()
 				return;
 
 			case "DELETE":
 				(async () => {
+					const { postData } = await getPostData({ req });
+					const parsedData = postData === "" ? -1 : JSON.parse(postData);
 					respond({
 						res,
 						"statusCode": 200,
 						"chunk": await (async () => {
-							if (req.url === "/" || req.url === undefined) {
+							if (parsedData === -1) {
 								await taskApi.deleteAllTasks();
 								return "all tasks deleted";
 							}
 
+							if(parsedData.hasOwnProperty("length")){
+								return await taskApi.deleteTasks({
+									"ids": parsedData
+								});
+							};
+
 							return await taskApi.deleteTask({
-								"id": parseInt(req.url.replace(/^\//, ""), 10)
+								"id": parsedData
 							})
 						})()
 					});
