@@ -7,6 +7,7 @@ export type Task = {
 	id: number;
 	message: string;
 	isCompleted: boolean;
+	isSelected: boolean;
 };
 
 export type TaskApi = {
@@ -14,7 +15,9 @@ export type TaskApi = {
 	getTask: (params: { id: number; }) => Promise<Task>;
 	addTask: (params: Omit<Task, "id">) => Promise<{ id: number; }>;
 	updateTask: (params: { task: Task; }) => Promise<void>;
+	updateTasks: (params: {tasks: Task[]; }) => Promise<void>;
 	deleteTask: (params: { id: number; }) => Promise<Task>;
+	deleteTasks: (params: {ids: number[]}) => Promise<void>;
 	deleteAllTasks: () => Promise<void>;
 };
 
@@ -107,6 +110,24 @@ function createTaskApi(
 
 			return Promise.resolve();
 		},
+		"updateTasks": ({ tasks: updatedTasks }) => {
+
+			tasksMutation({
+				"performMutation": tasks => {
+
+					updatedTasks.forEach(task => {
+						const index = tasks.findIndex(({ id }) => id === task.id);
+						assert(index !== -1);
+						tasks[index] = task;
+					});
+
+					return Promise.resolve();
+				}
+			})
+
+			return Promise.resolve();
+
+		},
 		"deleteTask": async ({ id }) => {
 
 			const dTask = new Deferred<Task>();
@@ -124,6 +145,22 @@ function createTaskApi(
 
 			return dTask.pr
 
+		},
+
+		"deleteTasks": ({ ids }) => {
+
+			tasksMutation({
+				"performMutation": tasks => {
+					ids.forEach(id => {
+						const index = tasks.findIndex(task => task.id === id);
+						assert(index !== -1);
+						tasks.splice(index, 1);
+					});
+					return Promise.resolve();
+				}
+			})
+
+			return Promise.resolve();
 		},
 		"deleteAllTasks": () => {
 
