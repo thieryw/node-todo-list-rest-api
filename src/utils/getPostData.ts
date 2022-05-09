@@ -4,7 +4,7 @@ export function getPostData(params: { req: IncomingMessage }) {
 
 	const { req } = params;
 
-	return new Promise<string>((resolve, reject) => {
+	return new Promise<{postData: string}>((resolve, reject) => {
 
 		try {
 			let body = "";
@@ -14,7 +14,7 @@ export function getPostData(params: { req: IncomingMessage }) {
 			});
 
 			req.on("end", () => {
-				resolve(body);
+				resolve({"postData": body});
 			})
 
 		} catch (err) {
