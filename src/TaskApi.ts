@@ -38,11 +38,11 @@ function createTaskApi(
 	const { tasksMutation } = params;
 
 	return {
-		"getTasks": () => {
+		"getTasks": async () => {
 
 			const dTasks = new Deferred<Task[]>();
 
-			tasksMutation({
+			await tasksMutation({
 				"performMutation": async tasks =>
 					dTasks.resolve(tasks)
 			})
@@ -55,7 +55,7 @@ function createTaskApi(
 
 			const dTask = new Deferred<Task>();
 
-			tasksMutation({
+			await tasksMutation({
 				"performMutation": tasks => {
 
 					const task = tasks.find(task => task.id === id);
@@ -65,6 +65,7 @@ function createTaskApi(
 					dTask.resolve(task);
 
 					return Promise.resolve();
+
 
 				}
 			});
@@ -97,9 +98,9 @@ function createTaskApi(
 			return dId.pr.then(id => ({ id }))
 
 		},
-		"updateTask": ({ task }) => {
+		"updateTask": async ({ task }) => {
 
-			tasksMutation({
+			await tasksMutation({
 				"performMutation": tasks => {
 					const index = tasks.findIndex(({ id }) => id === task.id);
 					assert(index !== -1);
@@ -108,11 +109,10 @@ function createTaskApi(
 				}
 			})
 
-			return Promise.resolve();
 		},
-		"updateTasks": ({ tasks: updatedTasks }) => {
+		"updateTasks": async ({ tasks: updatedTasks }) => {
 
-			tasksMutation({
+			await tasksMutation({
 				"performMutation": tasks => {
 
 					updatedTasks.forEach(task => {
@@ -125,14 +125,12 @@ function createTaskApi(
 				}
 			})
 
-			return Promise.resolve();
-
 		},
 		"deleteTask": async ({ id }) => {
 
 			const dTask = new Deferred<Task>();
 
-			tasksMutation({
+			await tasksMutation({
 				"performMutation": tasks => {
 					const index = tasks.findIndex(task => task.id === id);
 					assert(index !== -1);
@@ -147,9 +145,9 @@ function createTaskApi(
 
 		},
 
-		"deleteTasks": ({ ids }) => {
+		"deleteTasks": async ({ ids }) => {
 
-			tasksMutation({
+			await tasksMutation({
 				"performMutation": tasks => {
 					ids.forEach(id => {
 						const index = tasks.findIndex(task => task.id === id);
@@ -160,18 +158,15 @@ function createTaskApi(
 				}
 			})
 
-			return Promise.resolve();
 		},
-		"deleteAllTasks": () => {
+		"deleteAllTasks": async () => {
 
-			tasksMutation({
+			await tasksMutation({
 				"performMutation": tasks => {
 					tasks.splice(0, tasks.length);
 					return Promise.resolve();
 				}
 			})
-
-			return Promise.resolve();
 
 		}
 
@@ -198,39 +193,40 @@ export function createRamTaskApi(
 
 }
 
-export function createFilePersistedTaskApi(
+export async function createFilePersistedTaskApi(
 	params: {
 		filePath: string;
 	}
 ) {
+	console.log("ok");
 
 	const { filePath } = params;
 
+	const tasks = await (async ()=>{
+
+		if(!fs.existsSync(filePath)){
+			return [];
+		};
+
+		return JSON.parse((
+			await new Promise<Buffer>((resolve, reject) =>
+				fs.readFile(filePath, (err, buff) => {
+
+					if (err !== null) {
+						reject(err);
+						return;
+					}
+
+					resolve(buff);
+
+				})
+			)
+		).toString("utf8"));
+
+	})()
+
 	const tasksMutation: DataMutationFunction<Task[]> =
 		runExclusive.build(async ({ performMutation }) => {
-
-			const tasks = await (async () => {
-
-				if (!fs.existsSync(filePath)) {
-					return [];
-				}
-
-				return JSON.parse((
-					await new Promise<Buffer>((resolve, reject) =>
-						fs.readFile(filePath, (err, buff) => {
-
-							if (err !== null) {
-								reject(err);
-								return;
-							}
-
-							resolve(buff);
-
-						})
-					)
-				).toString("utf8"));
-
-			})();
 
 			await performMutation(tasks);
 

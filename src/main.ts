@@ -19,9 +19,9 @@ function respond(params: {
 	res.end(JSON.stringify(chunk));
 }
 
-function main() {
+async function main() {
 
-	const taskApi = createFilePersistedTaskApi({
+	const taskApi = await createFilePersistedTaskApi({
 		"filePath": pathJoin(process.cwd(), "data", "tasks.json")
 	});
 
