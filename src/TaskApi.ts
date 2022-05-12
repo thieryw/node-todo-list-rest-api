@@ -198,7 +198,6 @@ export async function createFilePersistedTaskApi(
 		filePath: string;
 	}
 ) {
-	console.log("ok");
 
 	const { filePath } = params;
 

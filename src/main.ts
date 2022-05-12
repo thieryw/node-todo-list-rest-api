@@ -1,6 +1,5 @@
 import http from "http";
 import type { ServerResponse } from "http";
-//const tasks = require("../data/tasks");
 import { getPostData } from "./utils/getPostData";
 import { createFilePersistedTaskApi /*createRamTaskApi*/ } from "./TaskApi";
 import { join as pathJoin } from "path";
@@ -34,8 +33,6 @@ async function main() {
 		res.setHeader("Access-Control-Request-Method", "*");
 		res.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, PUT, POST, DELETE");
 		res.setHeader("Access-Control-Allow-Headers", "*");
-
-		console.log(req.method);
 
 		switch (req.method) {
 			case "OPTIONS": res.end(); return;
