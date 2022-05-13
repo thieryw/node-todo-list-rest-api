@@ -43,8 +43,10 @@ function createTaskApi(
 			const dTasks = new Deferred<Task[]>();
 
 			await tasksMutation({
-				"performMutation": async tasks =>
-					dTasks.resolve(tasks)
+				"performMutation": tasks => {
+					dTasks.resolve(tasks);
+					return Promise.resolve();
+				}
 			})
 
 			return dTasks.pr;
