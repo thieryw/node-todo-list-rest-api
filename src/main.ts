@@ -39,16 +39,14 @@ async function main() {
 			case "GET":
 				(async () => {
 
-					const id = req.url === "/" ? undefined : req.url?.replace(/^\//, "");
+					const { postData } = await getPostData({ req });
 
 					respond({
 						res,
 						"statusCode": 200,
-						"chunk":
-							id === undefined ? await taskApi.getTasks() :
-								await taskApi.getTask({
-									"id": parseInt(id, 10)
-								})
+						"chunk": postData === "" ? 
+							await taskApi.getTasks() : 
+							await taskApi.getTask({ "id": parseInt(postData) })
 					});
 
 				})()
@@ -106,7 +104,7 @@ async function main() {
 								return "all tasks deleted";
 							}
 
-							if(parsedData.hasOwnProperty("length")){
+							if (parsedData.hasOwnProperty("length")) {
 								return await taskApi.deleteTasks({
 									"ids": parsedData
 								});
